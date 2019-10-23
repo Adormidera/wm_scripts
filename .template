@@ -60,26 +60,27 @@ function cecho (){
   echo -e "$1"
 }
 function ok_msg () {
-  cecho "${FG_WHITE}[${FG_DEFAULT}  ${FG_GREEN}OK${FG_DEFAULT}   $FG_WHITE]${FG_DEFAULT} $@"
+  cecho "${FG_WHITE}[${FG_DEFAULT}${FG_GREEN}+${FG_DEFAULT}$FG_WHITE]${FG_DEFAULT} $@"
 }
 function inf_msg () {
-  cecho "${FG_WHITE}[${FG_DEFAULT}  ${FG_BLUE}INF${FG_DEFAULT}  $FG_WHITE]${FG_DEFAULT} $@"
+  cecho "${FG_WHITE}[${FG_DEFAULT}${FG_BLUE}*${FG_DEFAULT}$FG_WHITE]${FG_DEFAULT} $@"
 }
 function war_msg () {
-  cecho "${FG_WHITE}[${FG_DEFAULT}  ${FG_YELLOW}WAR${FG_DEFAULT}  $FG_WHITE]${FG_DEFAULT} $@"
+  cecho "${FG_WHITE}[${FG_DEFAULT}${FG_YELLOW}!${FG_DEFAULT}$FG_WHITE]${FG_DEFAULT} $@"
 }
 function err_msg () {
-  cecho "${FG_WHITE}[${FG_DEFAULT}  ${FG_RED}ERR${FG_DEFAULT}  $FG_WHITE]${FG_DEFAULT} $@"
+  cecho "${FG_WHITE}[${FG_DEFAULT}${FG_RED}x${FG_DEFAULT}$FG_WHITE]${FG_DEFAULT} $@"
 }
 function deb_msg () {
   if [[ $VERBOSE -ne 0 ]]; then
-    cecho "${FG_WHITE}[${FG_DEFAULT}  ${FG_MAGENTA}DBG${FG_DEFAULT}  $FG_WHITE]${FG_DEFAULT} $@"
+    cecho "${FG_WHITE}[${FG_DEFAULT}${FG_MAGENTA}-${FG_DEFAULT}$FG_WHITE]${FG_DEFAULT} $@"
   fi
 }
 
 function yesno () {
   [[ $YESTOALL -eq 1 ]] && { return 0; }
-  read -p  "Esta Seguro (Y/N)" OPT
+  read -p "$1(y/n) " -n 1 OPT
+  echo ""
   if [ $(echo "$OPT" | tr '[:upper:]' '[:lower:]') == "y" ]; then
     return 0
   else

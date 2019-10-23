@@ -34,26 +34,20 @@ done
 
 
 
-inf_msg "Iniciando instalador villegas"
-inf_msg "Instalando en el directorio: $HOME"
-deb_msg "Instalando para el usuario: $USER"
-deb_msg "Sistema Operativo: $platform"
-inf_msg "Es correcto?"
-yesno
-[[ $? -ne 0 ]] && { err_msg "Instalacion abortada. Saliendo..."; exit; }
-ok_msg "Comenzando la instalacion"
+inf_msg "Launching A.Villegas environment installer"
+deb_msg "Installing config for user: $USER"
+deb_msg "Operative System: $platform"
+yesno "Is correct?"
+[[ $? -ne 0 ]] && { err_msg "Aborted installation. Exiting..."; exit; }
+inf_msg "Beginning Installation"
 
-[[ -d vim_config/vim ]] && { deb_msg "Borrando datos antiguos..."; rm -Rf vim_config/vim; }
 
-deb_msg "Descomprimiendo..."
-tar xzf $VILLEGAS_HOME/vim_config/vim.tar.gz -C $VILLEGAS_HOME/ 1>/dev/null
 
-deb_msg "Instalando Bashrc..."
+# Bash Config file
+##########################################################################
+deb_msg "Installing Bash Config"
 if [[ $platform == "linux" ]]; then
   bashrc_target_file="$HOME/.bashrc"
-  inf_msg "Instalar bashrc Maestro?"
-  yesno
-  [[ $? -ne 0 ]] && { war_msg "No se va a instalar Bashrc Maestro"; } || { sudo cp $HOME/.villegas/bash_config/bashrc_master /etc/bashrc; ok_msg "Bashrc Maestro instalado"; }
 elif [[ $platform == "macos" ]]; then
   bashrc_target_file="$HOME/.bash_profile"
 fi
@@ -63,26 +57,49 @@ if [[ -h $bashrc_target_file ]];then
 elif [[ -f $bashrc_target_file ]]; then
     mv $bashrc_target_file ${bashrc_target_file}_old_$(date +%s)
 fi
+
 ln -s ~/.villegas/bash_config/bashrc_villegas $bashrc_target_file
 
-deb_msg "Instalando vimrc..."
+
+
+# Master Bash Config file
+##########################################################################
+yesno "Do you want to install master bashrc file? (It will affect to all users)"
+[[ $? -ne 0 ]] || { sudo cp $HOME/.villegas/bash_config/bashrc_master /etc/bashrc; ok_msg "Master bashrc file installed"; }
+
+
+
+# ViM Config file
+##########################################################################
+deb_msg "Installing ViM Config"
 if [[ -h $HOME/.vimrc ]];then 
     unlink $HOME/.vimrc
 elif [[ -f $HOME/.vimrc ]];then 
     mv $HOME/.vimrc $HOME/.vimrc_old_$(date +%s)
 fi
+
 ln -s $HOME/.villegas/vim_config/vimrc $HOME/.vimrc
 
-deb_msg "Instalando vim..."
+
+
+# ViM Config file
+##########################################################################
+deb_msg "Installing ViM Plugins"
 if [[ -h $HOME/.vim ]]; then
      unlink $HOME/.vim
 elif [[ -f $HOME/.vim ]];then 
     mv $HOME/.vim .vim_old_$(date +%s)
 fi
+
 ln -s $HOME/.villegas/vim_config/vim $HOME/.vim
 
-deb_msg "Configurando path"
-[[ ! -h $HOME/grv ]] && { ln -s $HOME/.villegas/software/grv $HOME/grv; }
+inf_msg "Installing ViM plugins dir"
+[[ -d vim_config/vim ]] && { deb_msg "Cleanning old data"; rm -Rf vim_config/vim; }
+
+tar xzf $VILLEGAS_HOME/vim_config/vim.tar.gz -C $VILLEGAS_HOME/ 1>/dev/null
 
 
-ok_msg "Instalacion Finalizada"
+
+# Finish
+##########################################################################
+ok_msg "Installation Finished"
