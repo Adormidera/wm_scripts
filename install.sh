@@ -8,14 +8,24 @@
 #notes           :Depends on the template file
 #==============================================================================
 
+
+
+
+
+#============================== Global Variables ==============================#
+#==============================================================================#
 TEMPLATE_FILE="$HOME/.villegas/.template"
 VILLEGAS_HOME="$HOME/.villegas"
 source $TEMPLATE_FILE
-checkOS
-
 VERBOSE=1
 YESTOALL=0
 
+
+
+
+
+#============================== Init ==========================================#
+#==============================================================================#
 while getopts "hvqy" arg; do
   case $arg in
     h)
@@ -36,7 +46,7 @@ done
 
 inf_msg "Launching A.Villegas environment installer"
 deb_msg "Installing config for user: $USER"
-deb_msg "Operative System: $platform"
+deb_msg "Operative System: $(cat /etc/os-release | grep "^NAME=" | awk -F "=" '{print $2}')"
 yesno "Is correct?"
 [[ $? -ne 0 ]] && { err_msg "Aborted installation. Exiting..."; exit; }
 inf_msg "Beginning Installation"
@@ -46,11 +56,7 @@ inf_msg "Beginning Installation"
 # Bash Config file
 ##########################################################################
 deb_msg "Installing Bash Config"
-if [[ $platform == "linux" ]]; then
-  bashrc_target_file="$HOME/.bashrc"
-elif [[ $platform == "macos" ]]; then
-  bashrc_target_file="$HOME/.bash_profile"
-fi
+bashrc_target_file="$HOME/.bashrc"
 
 if [[ -h $bashrc_target_file ]];then
     unlink $bashrc_target_file
