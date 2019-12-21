@@ -88,7 +88,7 @@ elif [[ -f $HOME/.vim ]];then
     mv $HOME/.vim .vim_old_$(date +%s)
 fi
 
-ln -s $HOME/.villegas/vim_config/vim $HOME/.vim
+ln -s $HOME/.villegas/vim $HOME/.vim
 
 inf_msg "Installing ViM plugins dir"
 [[ -d vim_config/vim ]] && { deb_msg "Cleanning old data"; rm -Rf vim_config/vim; }
