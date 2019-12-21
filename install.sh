@@ -2,8 +2,6 @@
 #title           :install.sh
 #description     :Install Villegas vim and bash configurations
 #author          :alejandro.villegas
-#date            :20180605
-#version         :0.2
 #usage           :./install.sh
 #notes           :Depends on the template file
 #==============================================================================
@@ -64,14 +62,7 @@ elif [[ -f $bashrc_target_file ]]; then
     mv $bashrc_target_file ${bashrc_target_file}_old_$(date +%s)
 fi
 
-ln -s ~/.villegas/bash_config/bashrc_villegas $bashrc_target_file
-
-
-
-# Master Bash Config file
-##########################################################################
-yesno "Do you want to install master bashrc file? (It will affect to all users)"
-[[ $? -ne 0 ]] || { sudo cp $HOME/.villegas/bash_config/bashrc_master /etc/bashrc; ok_msg "Master bashrc file installed"; }
+ln -s ~/.villegas/bash_config/bashrc $bashrc_target_file
 
 
 
@@ -103,6 +94,23 @@ inf_msg "Installing ViM plugins dir"
 [[ -d vim_config/vim ]] && { deb_msg "Cleanning old data"; rm -Rf vim_config/vim; }
 
 tar xzf $VILLEGAS_HOME/vim_config/vim.tar.gz -C $VILLEGAS_HOME/ 1>/dev/null
+
+
+
+# i3 Config
+##########################################################################
+deb_msg "i3wm Config"
+if [[ -f $HOME/.config/i3/config ]];then 
+    mv $HOME/.config/i3/config $HOME/.config/i3/config_old_$(date +%s)
+fi
+ln -s $HOME/.villegas/i3wm_config/i3_config $HOME/.config/i3/config
+
+
+deb_msg "i3status Config"
+if [[ -f $HOME/.config/i3status/config ]];then 
+    mv $HOME/.config/i3status/config $HOME/.config/i3status/config_old_$(date +%s)
+fi
+ln -s $HOME/.villegas/i3wm_config/i3status_config $HOME/.config/i3status/config
 
 
 
