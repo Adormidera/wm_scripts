@@ -41,8 +41,6 @@ set updatetime=200
 " Local Leader. Prefijo para mapeos en ciertos tipos de ficheros
 let maplocalleader = "\\"
 
-
-
 " ---------------------------------------------\
 " -- Configuraciones de Folding
 " -----------------------------------------------------------------------------\
@@ -79,43 +77,6 @@ set spelllang=es
 
 
 " ---------------------------------------------\
-" -- Configuracion de set de colores
-" -----------------------------------------------------------------------------\
-"Colores xterm 256
-set t_Co=256
-
-
-
-" ---------------------------------------------\
-" -- Configuracion de Resaltado (Highlight)
-" -----------------------------------------------------------------------------\
-""Modo de busqueda
-hi Search ctermbg=0 ctermbg=166
-hi Search guibg=#CC4A05 guifg=#000000
-
-"Modo de prediccion de palabras
-hi Pmenu ctermfg=15 ctermbg=17 guibg=#00004C guifg=#E7EEEC
-hi PmenuSel ctermfg=15 ctermbg=124 guibg=#9D0003 guifg=#000000
-hi Visual ctermbg=19 ctermfg=15 guifg=#FFFFFF guibg=#01019F
-
-"Modo de VCSVimDiff
-hi DiffAdd    cterm=bold ctermfg=15 ctermbg=28 gui=none guifg=bg guibg=Red
-hi DiffDelete cterm=bold ctermfg=15 ctermbg=160 gui=none guifg=bg guibg=Red
-hi DiffChange cterm=bold ctermfg=15 ctermbg=208 gui=none guifg=bg guibg=Red
-hi DiffText   cterm=bold ctermfg=15 ctermbg=18 gui=none guifg=bg guibg=Red
-
-"Columna vertical de limite
-hi ColorColumn ctermbg=8 guibg=#606060
-"
-"Columna de visualizacion de marcas
-hi SignColumn ctermbg=0
-hi SignatureMarkLine ctermbg=233
-hi SignatureMarkerText ctermbg=8 ctermfg=12
-hi SignatureMarkText ctermbg=0 ctermfg=1
-
-
-
-" ---------------------------------------------\
 " -- Configuraciones especificas segun el tipo de fichero
 " -----------------------------------------------------------------------------\
 "Aplica a las extensiones de los ficheros el coloreado de sintaxis "especificado
@@ -123,7 +84,6 @@ au BufNewFile,BufRead *.org setlocal ft=org
 au BufNewFile,BufRead *.txt set spell tw=80 linebreak
 au BufNewFile,BufRead *.tex set spell tw=80 linebreak
 au BufNewFile,BufRead *.vnt set spell tw=80 linebreak
-au BufNewFile,BufRead *.vnt colorscheme onedark
 au BufNewFile,BufRead *.vnt hi Visual ctermbg=19 ctermfg=15 guifg=#FFFFFF guibg=#01019F
 au BufNewFile,BufRead *.go  set ft=go
 au BufNewFile,BufRead *.go  TagbarOpen
@@ -167,6 +127,8 @@ call vundle#begin()
   Plugin 'majutsushi/tagbar'                  " Muestra las Tags en programacion
   Plugin 'w0rp/ale'                           " Evalua la sintaxis del codigo
   Plugin 'godlygeek/tabular'                  " Para tabular bloques de codigo
+  Plugin 'elzr/vim-json'                      " Json plugin
+  Plugin 'rafi/awesome-vim-colorschemes'      " Vim ColorSchemes
 call vundle#end()
 filetype plugin indent on
 " <<< Vundle Plugin Manager
@@ -174,16 +136,129 @@ filetype plugin indent on
 
 
 " ---------------------------------------------\
+" -- Configuracion de set de colores
+" -----------------------------------------------------------------------------\
+"Colores xterm 256
+set t_Co=256
+
+
+
+" Colorscheme
+"colorscheme rdark-terminal2
+colorscheme default
+
+" ---------------------------------------------\
+" -- Configuracion de Resaltado (Highlight)
+" -----------------------------------------------------------------------------\
+"
+"
+
+" Basic Highlight
+hi Normal term=NONE cterm=NONE ctermbg=NONE ctermfg=250
+hi Underlined term=underline cterm=underline ctermbg=NONE ctermfg=111
+hi Ignore term=NONE cterm=NONE ctermbg=NONE ctermfg=16
+hi Error term=reverse cterm=NONE ctermbg=160 ctermfg=255
+hi Todo term=NONE cterm=NONE ctermbg=3 ctermfg=0
+
+" Code Highlight
+hi Boolean term=NONE cterm=NONE ctermbg=NONE ctermfg=129
+hi Number term=NONE cterm=NONE ctermbg=NONE ctermfg=129
+hi String term=NONE cterm=NONE ctermbg=NONE ctermfg=34
+hi Function term=NONE cterm=NONE ctermbg=NONE ctermfg=172
+hi Repeat term=NONE cterm=bold ctermbg=NONE ctermfg=172
+hi SpecialKey term=bold cterm=NONE ctermbg=NONE ctermfg=196
+hi NonText term=bold cterm=NONE ctermbg=NONE ctermfg=236
+hi MatchParen term=NONE cterm=NONE ctermbg=118 ctermfg=0
+hi Comment term=NONE cterm=NONE ctermbg=NONE ctermfg=242
+hi Constant term=underline cterm=NONE ctermbg=NONE ctermfg=113
+hi Special term=bold cterm=NONE ctermbg=NONE ctermfg=66
+hi Keyword term=NONE cterm=bold ctermbg=NONE ctermfg=172
+hi Identifier term=underline cterm=NONE ctermbg=NONE ctermfg=252
+hi Statement term=bold cterm=bold ctermbg=NONE ctermfg=172
+hi Operator term=bold cterm=NONE ctermbg=NONE ctermfg=3
+hi PreProc term=underline cterm=NONE ctermbg=NONE ctermfg=215
+hi Type term=underline cterm=NONE ctermbg=NONE ctermfg=65
+
+" Splits Highlight
+hi LineNr term=underline cterm=NONE ctermbg=NONE ctermfg=184
+
+" NU Highlight
+hi VertSplit term=NONE cterm=NONE ctermbg=235 ctermfg=59
+
+" TagBar Highlight
+hi TagbarKind term=NONE cterm=bold ctermbg=0 ctermfg=125
+hi TagbarScope term=NONE cterm=bold ctermbg=0 ctermfg=125
+hi TagbarFoldIcon term=NONE cterm=NONE ctermbg=0 ctermfg=3
+hi TagbarHelpKey  term=NONE cterm=NONE ctermbg=0 ctermfg=125
+hi TagbarHelpTitle term=NONE cterm=NONE ctermbg=0 ctermfg=172
+hi TagbarHelp term=NONE cterm=NONE ctermbg=NONE ctermfg=242
+hi TagbarNestedKind term=NONE cterm=bold ctermbg=0 ctermfg=172
+hi TagbarType term=NONE cterm=NONE ctermbg=0 ctermfg=3
+hi TagbarSignature term=NONE cterm=NONE ctermbg=0 ctermfg=39
+hi TagbarPseudoID term=NONE cterm=NONE ctermbg=0 ctermfg=19
+hi TagbarHighlight term=NONE cterm=NONE ctermbg=10 ctermfg=0
+hi TagbarAccessPublic term=NONE cterm=NONE ctermbg=0 ctermfg=10
+hi TagbarAccessProtected term=NONE cterm=NONE ctermbg=0 ctermfg=11
+hi TagbarAccessPrivate term=NONE cterm=NONE ctermbg=0 ctermfg=9
+hi TagbarVisibilityPublic term=NONE cterm=NONE ctermbg=0 ctermfg=10
+hi TagbarVisibilityProtected term=NONE cterm=NONE ctermbg=0 ctermfg=11
+hi TagbarVisibilityPrivate term=NONE cterm=NONE ctermbg=0 ctermfg=9
+
+" Go Highlight
+let g:go_highlight_functions = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_types = 1
+let g:go_highlight_build_constraints = 1
+hi goFunction term=NONE cterm=bold ctermbg=NONE ctermfg=125
+hi goTypeName term=NONE cterm=NONE ctermbg=NONE ctermfg=39
+hi goTypeConstructor term=NONE cterm=NONE ctermbg=NONE ctermfg=39
+hi goReceiverType term=NONE cterm=NONE ctermbg=NONE ctermfg=39
+
+
+"Modo de busqueda
+hi Search ctermbg=0 ctermbg=166
+hi Search guibg=#CC4A05 guifg=#000000
+
+"Modo de prediccion de palabras
+hi Pmenu ctermfg=15 ctermbg=17 guibg=#00004C guifg=#E7EEEC
+hi PmenuSel ctermfg=15 ctermbg=124 guibg=#9D0003 guifg=#000000
+hi Visual ctermbg=19 ctermfg=15 guifg=#FFFFFF guibg=#01019F
+
+"Modo de VCSVimDiff
+hi DiffAdd    cterm=bold ctermfg=15 ctermbg=28 gui=none guifg=bg guibg=Red
+hi DiffDelete cterm=bold ctermfg=15 ctermbg=160 gui=none guifg=bg guibg=Red
+hi DiffChange cterm=bold ctermfg=15 ctermbg=208 gui=none guifg=bg guibg=Red
+hi DiffText   cterm=bold ctermfg=15 ctermbg=18 gui=none guifg=bg guibg=Red
+
+"Columna vertical de limite
+hi ColorColumn ctermbg=8 guibg=#606060
+
+"Columna de visualizacion de marcas
+hi SignColumn ctermbg=0
+hi SignatureMarkLine ctermbg=233
+hi SignatureMarkerText ctermbg=8 ctermfg=12
+hi SignatureMarkText ctermbg=0 ctermfg=1
+
+"Simbolos de cambios en Git
+hi GitGutterAdd          cterm=bold ctermfg=28  ctermbg=0 gui=none guifg=bg guibg=Red
+hi GitGutterChange       cterm=bold ctermfg=208 ctermbg=0 gui=none guifg=bg guibg=Red
+hi GitGutterDelete       cterm=bold ctermfg=160 ctermbg=0 gui=none guifg=bg guibg=Red
+hi GitGutterChangeDelete cterm=bold ctermfg=90  ctermbg=0 gui=none guifg=bg guibg=Red
+
+
+" ---------------------------------------------\
 " -- Configuracion del plugin Airline
 " -----------------------------------------------------------------------------\
 " AirLine Config
-let g:airline_theme='dark'
+let g:airline_theme='murmur'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#hunks#enabled = 1
+let g:airline#extensions#tabline#switch_buffers_and_tabs = 1
 " Ini air-line
-let g:airline_powerline_fonts = 1
+let g:airline_powerline_fonts = 0
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
@@ -200,6 +275,8 @@ let g:airline_symbols.paste = 'ρ'
 let g:airline_symbols.paste = 'Þ'
 let g:airline_symbols.linenr = 'Ξ'
 let g:airline_symbols.whitespace = ''
+let g:airline#extensions#tabline#left_sep = ''
+let g:airline#extensions#tabline#left_alt_sep = ' '
 
 
 
@@ -225,11 +302,6 @@ let g:gitgutter_sign_removed = 'x'
 let g:gitgutter_sign_removed_first_line = '_'
 let g:gitgutter_sign_modified_removed = '-'
 
-"Simbolos de cambios en Git
-hi GitGutterAdd          cterm=bold ctermfg=28  ctermbg=0 gui=none guifg=bg guibg=Red
-hi GitGutterChange       cterm=bold ctermfg=208 ctermbg=0 gui=none guifg=bg guibg=Red
-hi GitGutterDelete       cterm=bold ctermfg=160 ctermbg=0 gui=none guifg=bg guibg=Red
-hi GitGutterChangeDelete cterm=bold ctermfg=90  ctermbg=0 gui=none guifg=bg guibg=Red
 
 
 
