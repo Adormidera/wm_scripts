@@ -22,7 +22,7 @@ set tabstop=2
 set shiftwidth=2
 
 "Colorear columna de limite de linea
-set colorcolumn=80
+set colorcolumn=0
 
 "No partir lineas
 set nowrap
@@ -44,10 +44,11 @@ let maplocalleader = "\\"
 " ---------------------------------------------\
 " -- Configuraciones de Folding
 " -----------------------------------------------------------------------------\
-" Metodo de encarpetado
+" Fold Method by code indent
 set foldmethod=indent
-" Profundidad
-set foldlevel=99
+" Folding Level
+set foldlevel=5
+
 
 
 
@@ -84,7 +85,6 @@ au BufNewFile,BufRead *.org setlocal ft=org
 au BufNewFile,BufRead *.txt set spell tw=80 linebreak
 au BufNewFile,BufRead *.tex set spell tw=80 linebreak
 au BufNewFile,BufRead *.vnt set spell tw=80 linebreak
-au BufNewFile,BufRead *.vnt hi Visual ctermbg=19 ctermfg=15 guifg=#FFFFFF guibg=#01019F
 au BufNewFile,BufRead *.go  set ft=go
 au BufNewFile,BufRead *.go  TagbarOpen
 "au BufWritePost, *.tex !./build_doc.sh > /dev/null
@@ -180,10 +180,12 @@ hi PreProc term=underline cterm=NONE ctermbg=NONE ctermfg=215
 hi Type term=underline cterm=NONE ctermbg=NONE ctermfg=65
 
 " Splits Highlight
-hi LineNr term=underline cterm=NONE ctermbg=NONE ctermfg=184
+hi VertSplit term=NONE cterm=NONE ctermbg=235 ctermfg=59
 
 " NU Highlight
-hi VertSplit term=NONE cterm=NONE ctermbg=235 ctermfg=59
+hi LineNr term=underline cterm=NONE ctermbg=NONE ctermfg=243
+hi CursorLine term=NONE cterm=NONE ctermbg=234 ctermfg=NONE
+hi CursorLineNr term=NONE cterm=bold ctermbg=234 ctermfg=184
 
 " TagBar Highlight
 hi TagbarKind term=NONE cterm=bold ctermbg=0 ctermfg=125
@@ -217,8 +219,7 @@ hi goReceiverType term=NONE cterm=NONE ctermbg=NONE ctermfg=39
 
 
 "Modo de busqueda
-hi Search ctermbg=0 ctermbg=166
-hi Search guibg=#CC4A05 guifg=#000000
+hi Search ctermbg=184 ctermfg=0
 
 "Modo de prediccion de palabras
 hi Pmenu ctermfg=15 ctermbg=17 guibg=#00004C guifg=#E7EEEC
