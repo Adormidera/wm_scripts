@@ -47,7 +47,7 @@ let maplocalleader = "\\"
 " Fold Method by code indent
 set foldmethod=indent
 " Folding Level
-set foldlevel=5
+set foldlevel=99
 
 
 
@@ -86,6 +86,7 @@ au BufNewFile,BufRead *.txt set spell tw=80 linebreak
 au BufNewFile,BufRead *.tex set spell tw=80 linebreak
 au BufNewFile,BufRead *.vnt set spell tw=80 linebreak
 au BufNewFile,BufRead *.go  set ft=go
+au BufNewFile,BufRead *.h  set ft=c
 au BufNewFile,BufRead *.go  TagbarOpen
 "au BufWritePost, *.tex !./build_doc.sh > /dev/null
 "au BufNewFile,BufRead *.go  NERDTree
@@ -129,6 +130,7 @@ call vundle#begin()
   Plugin 'godlygeek/tabular'                  " Para tabular bloques de codigo
   Plugin 'elzr/vim-json'                      " Json plugin
   Plugin 'rafi/awesome-vim-colorschemes'      " Vim ColorSchemes
+  Plugin 'vim-scripts/vcscommand.vim'         " VCS Command
 call vundle#end()
 filetype plugin indent on
 " <<< Vundle Plugin Manager
@@ -159,6 +161,7 @@ hi Underlined term=underline cterm=underline ctermbg=NONE ctermfg=111
 hi Ignore term=NONE cterm=NONE ctermbg=NONE ctermfg=16
 hi Error term=reverse cterm=NONE ctermbg=160 ctermfg=255
 hi Todo term=NONE cterm=NONE ctermbg=3 ctermfg=0
+hi ExtraWhitespace ctermfg=255 ctermbg=9
 
 " Code Highlight
 hi Boolean term=NONE cterm=NONE ctermbg=NONE ctermfg=129
@@ -168,7 +171,7 @@ hi Function term=NONE cterm=NONE ctermbg=NONE ctermfg=172
 hi Repeat term=NONE cterm=bold ctermbg=NONE ctermfg=172
 hi SpecialKey term=bold cterm=NONE ctermbg=NONE ctermfg=196
 hi NonText term=bold cterm=NONE ctermbg=NONE ctermfg=236
-hi MatchParen term=NONE cterm=NONE ctermbg=118 ctermfg=0
+hi MatchParen term=NONE cterm=NONE ctermbg=0 ctermfg=118
 hi Comment term=NONE cterm=NONE ctermbg=NONE ctermfg=242
 hi Constant term=underline cterm=NONE ctermbg=NONE ctermfg=113
 hi Special term=bold cterm=NONE ctermbg=NONE ctermfg=66
@@ -338,3 +341,5 @@ let g:tagbar_type_go = {
   \ 'ctagsargs' : '-sort -silent'
 \ }
 nmap <F8> :TagbarToggle<CR>
+
+match ExtraWhitespace /\s\+$/
