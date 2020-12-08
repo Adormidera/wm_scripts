@@ -136,13 +136,9 @@ alias ls='ls --color=auto'
 alias ll='ls -l'
 alias la='ls -a'
 alias grep='grep --color'
+alias wifi_list='nmcli dev wifi list'
+alias wifi_scan='nmcli device wifi rescan'
+alias wifi_connect='nmcli device wifi connect $1 password $2'
+alias wifi_on='nmcli radio wifi on'
+alias wifi_off='nmcli radio wifi off'
 export GOPATH=$HOME/go
-
-
-
-
-
-#============================== Other Configs =================================#
-#==============================================================================#
-# Print System info at bash session init
-screenfetch -d '+disk'
