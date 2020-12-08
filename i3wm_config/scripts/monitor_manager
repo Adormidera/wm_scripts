@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
-#
-#   Copyright (c) 2016 James Murphy
-#   Licensed under the GPL version 2 only
-#
-# monitor_manager is an i3blocks blocklet script to quickly manage your
-# connected output devices
 
-
-from tkinter import * 
+from tkinter import *
 from tkinter import messagebox
 from shutil import which
 import tkinter.font as font
@@ -16,7 +9,6 @@ import re
 import os
 
 DESKTOP_SYMBOL = "\uf108"
-
 UP_ARROW = "\uf062"
 DOWN_ARROW = "\uf063"
 UNBLANKED_SYMBOL = "\uf06e"
@@ -48,14 +40,14 @@ def _default(name, default='', arg_type=strbool):
     return arg_type(val)
 
 
-SHOW_ON_OFF = _default("SHOW_ON_OFF","1") 
+SHOW_ON_OFF = _default("SHOW_ON_OFF","1")
 SHOW_NAMES = _default("SHOW_NAMES", "1")
 SHOW_PRIMARY = _default("SHOW_PRIMARY", "1")
 SHOW_MODE = _default("SHOW_MODE", "1")
 SHOW_BLANKED = _default("SHOW_BLANKED", "1")
 SHOW_DUPLICATE = _default("SHOW_DUPLICATE", "1")
 SHOW_ROTATION = _default("SHOW_ROTATION", "1")
-SHOW_REFLECTION = _default("SHOW_REFLECTION", "1") 
+SHOW_REFLECTION = _default("SHOW_REFLECTION", "1")
 SHOW_BRIGHTNESS = _default("SHOW_BRIGHTNESS", "1")
 SHOW_BRIGHTNESS_VALUE = _default("SHOW_BRIGHTNESS_VALUE", "0")
 SHOW_UP_DOWN = _default("SHOW_UP_DOWN", "1")
@@ -169,7 +161,7 @@ class Output:
                 output.sameAs = prev.name
             else:
                 prev = output
-            
+
         return outputs
 
     def modestr(mode):
@@ -202,7 +194,7 @@ class MonitorManager():
         self.outputs = []
         self.hardRefreshList()
         style = {'relief':FLAT, 'padx':1, 'pady':1, 'anchor':'w', 'font':FONTAWESOME_FONT}
-        
+
         self.infoLabel = Label(self.root, text="", **style)
         self.infoLabel.config(font=DEFAULT_FONT)
 
@@ -210,29 +202,29 @@ class MonitorManager():
 
         self.applyButton = Button(self.root, text=APPLY_SYMBOL, **style)
         self.bottomRow.append(self.applyButton)
-        
+
         self.refreshButton = Button(self.root, text=REFRESH_SYMBOL, **style)
         self.bottomRow.append(self.refreshButton)
-        
+
         if which("arandr"):
             self.arandrButton = Button(self.root, text=ARANDR_SYMBOL, **style)
             self.bottomRow.append(self.arandrButton)
         else:
             self.arandrButton = None
-            
+
         self.cancelButton = Button(self.root, text=CANCEL_SYMBOL, **style)
         self.bottomRow.append(self.cancelButton)
 
         self.infoLabel.grid(row=1,column=0, columnspan=len(self.bottomRow))
         self.gridRow(2, self.bottomRow)
-        
+
         self.moveToMouse()
         self.root.deiconify()
 
     def registerBindings(self):
         self.root.bind("<Return>", self.handleApply)
         self.root.bind("<Escape>", self.handleCancel)
-        
+
         self.applyButton.bind("<Button-1>", self.handleApply)
         self.setInfo(self.applyButton, "Apply changes")
 
@@ -251,15 +243,15 @@ class MonitorManager():
             toggleButton.bind("<Button-4>", self.handleUp)
             toggleButton.bind("<Button-5>", self.handleDown)
             self.setInfo(toggleButton, "Turn output on/off")
-        
+
         for primaryButton in self.primaryButtons:
             primaryButton.bind("<Button-1>", self.setPrimary)
             self.setInfo(primaryButton, "Set primary output")
-        
+
         for blankedButton in self.blankedButtons:
             blankedButton.bind("<Button-1>", self.toggleBlanked)
             self.setInfo(blankedButton, "Show/hide output")
-        
+
         for duplicateButton in self.duplicateButtons:
             duplicateButton.bind("<Button-1>", self.toggleDuplicate)
             self.setInfo(duplicateButton, "Duplicate another output")
@@ -275,7 +267,7 @@ class MonitorManager():
         for brightnessSlider in self.brightnessSliders:
             brightnessSlider.bind("<ButtonRelease-1>", self.updateBrightness)
             self.setInfo(brightnessSlider, "Adjust brightness")
-        
+
         for upButton in self.upButtons:
             upButton.bind("<Button-1>", self.handleUp)
             upButton.bind("<Button-4>", self.handleUp)
@@ -287,7 +279,7 @@ class MonitorManager():
             downButton.bind("<Button-4>", self.handleUp)
             downButton.bind("<Button-5>", self.handleDown)
             self.setInfo(downButton, "Move down")
-            
+
     def gridRow(self, row, widgets):
         column = 0
         for w in widgets:
@@ -295,7 +287,7 @@ class MonitorManager():
             column += 1
 
     def moveToMouse(self):
-        root = self.root 
+        root = self.root
         root.update_idletasks()
         width = root.winfo_reqwidth()
         height = root.winfo_reqheight()
@@ -424,7 +416,7 @@ class MonitorManager():
         for otherOutput in self.outputs:
             if otherOutput != output:
                 otherOutput.primary = False
-        self.softRefreshList() 
+        self.softRefreshList()
 
     def existsPrimary(self):
         for output in self.outputs:
@@ -516,8 +508,8 @@ class MonitorManager():
         return [o for o in self.outputs if o != output and o.sameAs == None]
 
     def softRefreshList(self, e=None):
-        for widget in set().union(self.nameLabels, self.primaryButtons, 
-                self.statusOptionMenus, self.blankedButtons, 
+        for widget in set().union(self.nameLabels, self.primaryButtons,
+                self.statusOptionMenus, self.blankedButtons,
                 self.duplicateButtons, self.rotateButtons, self.reflectButtons,
                 self.brightnessSliders, self.upButtons, self.downButtons):
             widget.config(fg="gray" if not widget.output.active else "black")
@@ -542,7 +534,7 @@ class MonitorManager():
                 self.setMenuToOutput(widget, widget.output)
                 self.setInfo(widget, "Select output mode")
 
-        for widget in self.blankedButtons: 
+        for widget in self.blankedButtons:
             widget.config(text=BLANKED_SYMBOL if widget.output.blanked else UNBLANKED_SYMBOL)
 
         for widget in self.duplicateButtons:
@@ -590,7 +582,7 @@ class MonitorManager():
         toggleButton = Button(self.frame, font=FONTAWESOME_FONT, **style)
         toggleButton.output = output
         self.toggleButtons.append(toggleButton)
-        if SHOW_ON_OFF: 
+        if SHOW_ON_OFF:
             widgets.append(toggleButton)
 
         nameLabel = Label(self.frame, font=DEFAULT_FONT)
@@ -642,7 +634,7 @@ class MonitorManager():
             widgets.append(reflectButton)
 
         brightnessSlider = Scale(self.frame, orient="horizontal", from_=0, to=100,
-                length=BRIGHTNESS_SLIDER_LENGTH, showvalue=SHOW_BRIGHTNESS_VALUE, 
+                length=BRIGHTNESS_SLIDER_LENGTH, showvalue=SHOW_BRIGHTNESS_VALUE,
                 sliderlength=BRIGHTNESS_SLIDER_HANDLE_LENGTH,
                 width=BRIGHTNESS_SLIDER_WIDTH, font=FONTAWESOME_FONT)
         brightnessSlider.output = output
@@ -661,10 +653,10 @@ class MonitorManager():
         self.downButtons.append(downButton)
         if SHOW_UP_DOWN:
             widgets.append(downButton)
-       
+
         for widget in widgets:
             widget.output = output
-        self.gridRow(row, widgets) 
+        self.gridRow(row, widgets)
         self.softRefreshList()
 
     def setMenuToOutput(self, optionMenu, output):

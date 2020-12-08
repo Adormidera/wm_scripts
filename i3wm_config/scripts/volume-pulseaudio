@@ -19,7 +19,10 @@ DEFAULT_COLOR=${DEFAULT_COLOR:-"#ffffff"}
 MUTED_COLOR=${MUTED_COLOR:-"#a0a0a0"}
 
 LONG_FORMAT=${LONG_FORMAT:-'${SYMB}${VOL}% [${INDEX}:${NAME}]'}
-SHORT_FORMAT=${SHORT_FORMAT:-'${SYMB}${VOL}% [${INDEX}]'}
+SHORT_FORMAT=${SHORT_FORMAT:-'${SYMB}${VOL}%'}
+CURRENT_FORMAT="$SHORT_FORMAT"
+FORMAT_FLAG=0
+
 USE_ALSA_NAME=${USE_ALSA_NAME:-0}
 USE_DESCRIPTION=${USE_DESCRIPTION:-0}
 
@@ -48,7 +51,7 @@ while getopts F:Sf:adH:M:L:X:T:t:C:c:i:m:s:h opt; do
         s) SCONTROL="$OPTARG" ;;
         h) printf \
 "Usage: volume-pulseaudio [-S] [-F format] [-f format] [-p] [-a|-d] [-H symb] [-M symb]
-        [-L symb] [-X symb] [-T thresh] [-t thresh] [-C color] [-c color] [-i inter] 
+        [-L symb] [-X symb] [-T thresh] [-t thresh] [-C color] [-c color] [-i inter]
         [-m mixer] [-s scontrol] [-h]
 Options:
 -F, -f\tOutput format (-F long format, -f short format) to use, with exposed variables:
@@ -105,10 +108,18 @@ function set_default_playback_device_next {
     move_sinks_to_new_default $default_sink
 }
 
+function switch_format {
+  if [[ "$CURRENT_FORMAT" == "$LONG_FORMAT" ]]; then
+    CURRENT_FORMAT=$SHORT_FORMAT
+  elif [[ "$CURRENT_FORMAT" == "$SHORT_FORMAT" ]]; then
+    CURRENT_FORMAT="$LONG_FORMAT"
+  fi
+}
+
 case "$BLOCK_BUTTON" in
-    1) set_default_playback_device_next ;;
+    1) switch_format $1 ;;
     2) pactl set-sink-mute @DEFAULT_SINK@ toggle ;;
-    3) set_default_playback_device_next -1 ;;
+    3) set_default_playback_device_next ;;
     4) pactl set-sink-volume @DEFAULT_SINK@ +$AUDIO_DELTA% ;;
     5) pactl set-sink-volume @DEFAULT_SINK@ -$AUDIO_DELTA% ;;
 esac
@@ -161,8 +172,8 @@ sed 's/.*= "\(.*\)".*/\1/')
     if [[ $SUBSCRIBE == 1 ]] ; then
         print_format "$LONG_FORMAT"
     else
-        print_format "$LONG_FORMAT"
-        print_format "$SHORT_FORMAT"
+        print_format "$CURRENT_FORMAT"
+        print_format "$CURRENT_FORMAT"
         echo "$COLOR"
     fi
 }
