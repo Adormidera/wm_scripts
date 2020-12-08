@@ -1,0 +1,65 @@
+#https://fontawesome.com/v4.7.0/cheatsheet/
+separator=true
+separator_block_width=10
+
+align=center
+markup=pango
+border_top=0
+border_bottom=1
+border_left=0
+border_right=0
+
+[spotify]
+align=center
+command=~/.config/i3/scripts/spotify
+interval=10
+label= 
+color=#81b71a
+
+[vpn]
+command=~/.config/i3/scripts/vpn
+label=VPN:
+interval=10
+
+[iface]
+command=~/.config/i3/scripts/iface -f " {status}" -cg "#1FC40D" -cc "#DE1212"
+instance=enp0s20f0u2
+interval=10
+
+[wifi]
+command=~/.config/i3/scripts/wifi -f " {status}" -cg "#1FC40D" -cc "#DE1212"
+instance=wlp2s0
+interval=10
+
+[temp]
+label= 
+command=~/.config/i3/scripts/temp
+interval=10
+
+[battery]
+command=~/.config/i3/scripts/battery
+interval=30
+color=#1FC40D
+
+# CPU
+[cpu]
+label= 
+command=~/.config/i3/scripts/cpu_usage
+interval=10
+color=#1070FF
+
+# Memory
+[memory]
+label= 
+command=~/.config/i3/scripts/memory
+interval=10
+color=#1070FF
+
+
+# Disk usage
+[disk]
+label= 
+command=~/.config/i3/scripts/disk
+interval=120
+color=#1070FF
+DIR=/
