@@ -27,7 +27,7 @@ color=#1070FF
 command=~/.config/i3/scripts/calendar
 LABEL= 
 DATEFMT=+%Y-%m-%d %H:%M
-interval=5
+interval=3600
 HEIGHT=-20
 WIDTH=240
 

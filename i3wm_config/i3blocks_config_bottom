@@ -23,12 +23,18 @@ interval=10
 
 [iface]
 command=~/.config/i3/scripts/iface -f " {status}" -cg "#1FC40D" -cc "#DE1212"
-instance=enp0s20f0u2
+instance=enp9s0
 interval=10
 
 [wifi]
 command=~/.config/i3/scripts/wifi -f " {status}" -cg "#1FC40D" -cc "#DE1212"
-instance=wlp2s0
+instance=wlp8s0
+interval=10
+
+[wifi2]
+command=~/.config/i3/scripts/wifi_menu
+instance=wlp8s0
+label=---
 interval=10
 
 [temp]
