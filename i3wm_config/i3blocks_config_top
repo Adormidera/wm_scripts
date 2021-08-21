@@ -27,8 +27,8 @@ color=#1070FF
 command=~/.config/i3/scripts/calendar
 LABEL= 
 DATEFMT=+%Y-%m-%d %H:%M
-interval=3600
-HEIGHT=-20
+interval=10
+HEIGHT=-10
 WIDTH=240
 
 [monitors]
@@ -37,7 +37,7 @@ interval=once
 
 [poweroff]
 full_text= 
-command=i3-msg mode -q " Lock     Exit     Reboot     Poweroff"
+command=i3-msg mode -q " Lock(l)     Exit(e)     Reboot(r)     Poweroff(p)     Suspend(s)"
 interval=0
 color=#ca0000
 

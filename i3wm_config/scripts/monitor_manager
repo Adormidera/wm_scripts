@@ -65,6 +65,13 @@ BRIGHTNESS_SLIDER_LENGTH = 50
 
 WINDOW_CLOSE_TO_BOUNDARY_BUFFER = _default("CLOSE_TO_BOUNDARY_BUFFER", 20, int)
 
+DEFAULT_FG_COLOR = "white"
+DEFAULT_BG_COLOR = "grey10"
+CONNECTED_COLOR='#1FC40D'
+DISCONNECTED_COLOR='#DE1212'
+DISCONNECT_FG_COLOR = "red1"
+CONNECTED_FG_COLOR = "green4"
+
 class Output:
     def __init__(self, name=None, w=None, h=None, x=None, y=None, rate=None,
             active=False, primary=False, sameAs=None, blanked=False, rotation="normal",
@@ -193,10 +200,10 @@ class MonitorManager():
         self.frame = None
         self.outputs = []
         self.hardRefreshList()
-        style = {'relief':FLAT, 'padx':1, 'pady':1, 'anchor':'w', 'font':FONTAWESOME_FONT}
+        style = {'bg': DEFAULT_BG_COLOR, 'fg':DEFAULT_FG_COLOR, 'relief':FLAT, 'padx':1, 'pady':1, 'anchor':'w', 'font':FONTAWESOME_FONT, 'bd':0}
 
         self.infoLabel = Label(self.root, text="", **style)
-        self.infoLabel.config(font=DEFAULT_FONT)
+        self.infoLabel.config(bg=DEFAULT_BG_COLOR, font=DEFAULT_FONT)
 
         self.bottomRow = []
 
@@ -283,11 +290,13 @@ class MonitorManager():
     def gridRow(self, row, widgets):
         column = 0
         for w in widgets:
+            w.configure(bg=DEFAULT_BG_COLOR)
             w.grid(row=row, column=column)
             column += 1
 
     def moveToMouse(self):
         root = self.root
+        root.configure(bg=DEFAULT_BG_COLOR)
         root.update_idletasks()
         width = root.winfo_reqwidth()
         height = root.winfo_reqheight()
@@ -307,7 +316,7 @@ class MonitorManager():
         root.geometry('+{}+{}'.format(x, y))
 
     def setInfo(self, widget, info):
-        widget.bind("<Enter>", lambda e: self.infoLabel.config(text=info, fg="black"))
+        widget.bind("<Enter>", lambda e: self.infoLabel.config(text=info, fg=DEFAULT_FG_COLOR))
         widget.bind("<Leave>", lambda e: self.infoLabel.config(text=""))
 
     def handleApply(self, e=None):
@@ -512,7 +521,7 @@ class MonitorManager():
                 self.statusOptionMenus, self.blankedButtons,
                 self.duplicateButtons, self.rotateButtons, self.reflectButtons,
                 self.brightnessSliders, self.upButtons, self.downButtons):
-            widget.config(fg="gray" if not widget.output.active else "black")
+            widget.config(fg=CONNECT_FG_COLOR if not widget.output.active else DISCONNECT_FG_COLOR)
 
         for widget in self.toggleButtons:
             widget.config(text=TOGGLE_ON if widget.output.active else TOGGLE_OFF)
@@ -523,7 +532,7 @@ class MonitorManager():
         for widget in self.primaryButtons:
             widget.config(text=PRIMARY_SYMBOL if widget.output.primary else SECONDARY_SYMBOL)
             if not widget.output.primary:
-                widget.config(fg="gray")
+                widget.config(fg=DEFAULT_FG_COLOR)
 
         for widget in self.statusOptionMenus:
             widget.config(text=widget.output.status())
@@ -556,6 +565,7 @@ class MonitorManager():
     def populateGrid(self):
         oldFrame = self.frame
         self.frame = Frame(self.root)
+        self.frame.configure(bg=DEFAULT_BG_COLOR)
         self.frame.grid(row=0, column=0, columnspan=len(self.bottomRow))
         self.toggleButtons = []
         self.nameLabels = []
@@ -576,7 +586,7 @@ class MonitorManager():
 
     def makeLabelRow(self, output, row):
         output.row = row
-        style = {'relief':FLAT, 'padx':1, 'pady':1, 'anchor':'w'}
+        style = {'bg': DEFAULT_BG_COLOR, 'relief':FLAT, 'padx':1, 'pady':1, 'anchor':'w'}
         widgets = []
 
         toggleButton = Button(self.frame, font=FONTAWESOME_FONT, **style)
@@ -595,7 +605,7 @@ class MonitorManager():
         primaryButton.output = output
         self.primaryButtons.append(primaryButton)
         if not output.primary:
-            primaryButton.config(fg="gray")
+            primaryButton.config(fg=DEFAULT_FG_COLOR)
         if SHOW_PRIMARY:
             widgets.append(primaryButton)
 
@@ -638,6 +648,7 @@ class MonitorManager():
                 sliderlength=BRIGHTNESS_SLIDER_HANDLE_LENGTH,
                 width=BRIGHTNESS_SLIDER_WIDTH, font=FONTAWESOME_FONT)
         brightnessSlider.output = output
+        brightnessSlider.configure(bg=DEFAULT_BG_COLOR, fg="blue")
         self.brightnessSliders.append(brightnessSlider)
         if SHOW_BRIGHTNESS:
             widgets.append(brightnessSlider)
@@ -707,9 +718,11 @@ def setLabelAndSameAsFunc(var, sameAs, output):
         output.sameAs = sameAs
     return func
 
-if os.environ.get('BLOCK_BUTTON') == "1":
+if True:
+#if os.environ.get('BLOCK_BUTTON') == "1":
     if os.fork() != 0:
         root = Tk()
+        root.configure(bg=DEFAULT_BG_COLOR)
         if DEFAULT_FONT_FAMILY and DEFAULT_FONT_SIZE:
             font.nametofont("TkDefaultFont").config(family=DEFAULT_FONT_FAMILY, size=DEFAULT_FONT_SIZE)
         manager = MonitorManager(root)

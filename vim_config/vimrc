@@ -1,48 +1,48 @@
-"    ____   ____.__.__  .__                             /\ ____   ____.__       __________                
-"    \   \ /   /|__|  | |  |   ____   _________    _____)/ \   \ /   /|__| _____\______   \ ____          
-"     \   Y   / |  |  | |  | _/ __ \ / ___\__  \  /  ___/   \   Y   / |  |/     \|       _// ___\         
-"      \     /  |  |  |_|  |_\  ___// /_/  > __ \_\___ \     \     /  |  |  Y Y  \    |   \  \___         
-"       \___/   |__|____/____/\___  >___  (____  /____  >     \___/   |__|__|_|  /____|_  /\___  >        
-"                                 \/_____/     \/     \/                       \/       \/     \/         
+"    ____   ____.__.__  .__                             /\ ____   ____.__       __________
+"    \   \ /   /|__|  | |  |   ____   _________    _____)/ \   \ /   /|__| _____\______   \ ____
+"     \   Y   / |  |  | |  | _/ __ \ / ___\__  \  /  ___/   \   Y   / |  |/     \|       _// ___\
+"      \     /  |  |  |_|  |_\  ___// /_/  > __ \_\___ \     \     /  |  |  Y Y  \    |   \  \___
+"       \___/   |__|____/____/\___  >___  (____  /____  >     \___/   |__|__|_|  /____|_  /\___  >
+"                                 \/_____/     \/     \/                       \/       \/     \/
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " ---------------------------------------------\
-" -- Configuraciones basicas
+" -- Basic Configs
 " -----------------------------------------------------------------------------\
-" Numero de Linea
 set nu
-
-" Colorear Sintaxis
 syntax on
 
-" Sustituir tabuladores por espacios
+" Spaces instead tabs
 set expandtab
 set tabstop=2
 set shiftwidth=2
 
-"Colorear columna de limite de linea
+" Colorcolum
 set colorcolumn=0
 
-"No partir lineas
+" Disable wrap lines
 set nowrap
 
-"Especial para entorno grafico (gvim / macvim)
+" Font for GUI
 if has("gui_running")
   set guifont=Noto_Mono_for_Powerline:h11
 endif
 
-"Encoding
+" Encoding
 set encoding=utf8
 
-" Frecuencia refresco ViM (ms)
+" Refresh frequency (milliseconds)
 set updatetime=200
 
 " Local Leader. Prefijo para mapeos en ciertos tipos de ficheros
 let maplocalleader = "\\"
 
+
+
+
 " ---------------------------------------------\
-" -- Configuraciones de Folding
+" -- Folding Configs
 " -----------------------------------------------------------------------------\
 " Fold Method by code indent
 set foldmethod=indent
@@ -53,32 +53,34 @@ set foldlevel=99
 
 
 " ---------------------------------------------\
-" -- Configuracion de busquedas
+" -- Searching Configs
 " -----------------------------------------------------------------------------\
-"Busqueda incremental
+" Incremental search
 set incsearch
 
-" Subrayar busqueda
+" Highlight search
 set hlsearch
-"
+
 " Insensitive Case
 set ic
 
 
 
+
 " ---------------------------------------------\
-" -- Configuracion de Idioma y Ortografia
+" -- Spelling Configs
 " -----------------------------------------------------------------------------\
-"No comprobar ortografia
+" Disable Spell by default
 set nospell
 
-"Idioma Espanol
-set spelllang=es
+" Spell English
+set spelllang=en
+
 
 
 
 " ---------------------------------------------\
-" -- Configuraciones especificas segun el tipo de fichero
+" -- File type specific configs
 " -----------------------------------------------------------------------------\
 "Aplica a las extensiones de los ficheros el coloreado de sintaxis "especificado
 au BufNewFile,BufRead *.org setlocal ft=org
@@ -86,23 +88,24 @@ au BufNewFile,BufRead *.txt set spell tw=80 linebreak
 au BufNewFile,BufRead *.tex set spell tw=80 linebreak
 au BufNewFile,BufRead *.vnt set spell tw=80 linebreak
 au BufNewFile,BufRead *.go  set ft=go
-au BufNewFile,BufRead *.h  set ft=c
 au BufNewFile,BufRead *.go  TagbarOpen
-"au BufWritePost, *.tex !./build_doc.sh > /dev/null
-"au BufNewFile,BufRead *.go  NERDTree
+au BufNewFile,BufRead *.h   set ft=c
+
 
 
 
 " ---------------------------------------------\
-" -- Configuracion de Mapeos
+" -- Mappings
 " -----------------------------------------------------------------------------\
 " Busca el texto seleccionado en modo visual
 vnoremap  // y/<C-R>"<CR>
+nmap <F8> :TagbarToggle<CR>
+nmap <F7> :NERDTreeToggle<CR>
 
 
 
 " ---------------------------------------------\
-" -- Configuracion Vundle y su lista de Plugins
+" -- Vundle Manager and plugins
 " -----------------------------------------------------------------------------\
 " Vundle Plugin Manager >>>
 set nocompatible              " be iMproved, required
@@ -120,7 +123,6 @@ call vundle#begin()
   Plugin 'gabrielelana/vim-markdown'          " Markdown complete and highlight
   Plugin 'danro/rename.vim'                   " Rename opened buffers
   Plugin 'xolox/vim-misc'                     " Miscelanea
-  Plugin 'xolox/vim-notes'                    " Org Notes
   Plugin 'vim-latex/vim-latex'                " Latex languaje highlight
   Plugin 'kshenoy/vim-signature'              " To display Marks
   Plugin 'will133/vim-dirdiff'                " Diff with two dirs
@@ -128,8 +130,7 @@ call vundle#begin()
   Plugin 'majutsushi/tagbar'                  " Muestra las Tags en programacion
   Plugin 'w0rp/ale'                           " Evalua la sintaxis del codigo
   Plugin 'godlygeek/tabular'                  " Para tabular bloques de codigo
-  Plugin 'elzr/vim-json'                      " Json plugin
-  Plugin 'rafi/awesome-vim-colorschemes'      " Vim ColorSchemes
+  Plugin 'elzr/vim-json'                      " JSON plugin
   Plugin 'vim-scripts/vcscommand.vim'         " VCS Command
 call vundle#end()
 filetype plugin indent on
@@ -138,22 +139,18 @@ filetype plugin indent on
 
 
 " ---------------------------------------------\
-" -- Configuracion de set de colores
+" -- Color Configs
 " -----------------------------------------------------------------------------\
 "Colores xterm 256
 set t_Co=256
-
-
-
-" Colorscheme
-"colorscheme rdark-terminal2
 colorscheme default
 
+
+
+
 " ---------------------------------------------\
-" -- Configuracion de Resaltado (Highlight)
+" -- Highlight Config
 " -----------------------------------------------------------------------------\
-"
-"
 
 " Basic Highlight
 hi Normal term=NONE cterm=NONE ctermbg=NONE ctermfg=250
@@ -176,7 +173,7 @@ hi Comment term=NONE cterm=NONE ctermbg=NONE ctermfg=242
 hi Constant term=underline cterm=NONE ctermbg=NONE ctermfg=113
 hi Special term=bold cterm=NONE ctermbg=NONE ctermfg=66
 hi Keyword term=NONE cterm=bold ctermbg=NONE ctermfg=172
-hi Identifier term=underline cterm=NONE ctermbg=NONE ctermfg=252
+hi Identifier term=underline cterm=bold ctermbg=NONE ctermfg=125
 hi Statement term=bold cterm=bold ctermbg=NONE ctermfg=172
 hi Operator term=bold cterm=NONE ctermbg=NONE ctermfg=3
 hi PreProc term=underline cterm=NONE ctermbg=NONE ctermfg=215
@@ -219,32 +216,41 @@ hi goFunction term=NONE cterm=bold ctermbg=NONE ctermfg=125
 hi goTypeName term=NONE cterm=NONE ctermbg=NONE ctermfg=39
 hi goTypeConstructor term=NONE cterm=NONE ctermbg=NONE ctermfg=39
 hi goReceiverType term=NONE cterm=NONE ctermbg=NONE ctermfg=39
+hi link goDeclaration Statement
+hi link goVar Statement
+hi goParamName term=NONE cterm=NONE ctermbg=NONE ctermfg=39
 
 
-"Modo de busqueda
+" YAML Highlight
+hi yamlDirective ctermbg=184 ctermfg=0
+hi yamlDirectiveName ctermbg=184 ctermfg=0
+hi Keyword ctermbg=0 ctermfg=184
+
+
+" Search Mode
 hi Search ctermbg=184 ctermfg=0
 
-"Modo de prediccion de palabras
+" Predict words menu
 hi Pmenu ctermfg=15 ctermbg=17 guibg=#00004C guifg=#E7EEEC
 hi PmenuSel ctermfg=15 ctermbg=124 guibg=#9D0003 guifg=#000000
 hi Visual ctermbg=19 ctermfg=15 guifg=#FFFFFF guibg=#01019F
 
-"Modo de VCSVimDiff
+" VCSVimDiff
 hi DiffAdd    cterm=bold ctermfg=15 ctermbg=28 gui=none guifg=bg guibg=Red
 hi DiffDelete cterm=bold ctermfg=15 ctermbg=160 gui=none guifg=bg guibg=Red
 hi DiffChange cterm=bold ctermfg=15 ctermbg=208 gui=none guifg=bg guibg=Red
 hi DiffText   cterm=bold ctermfg=15 ctermbg=18 gui=none guifg=bg guibg=Red
 
-"Columna vertical de limite
+" Split column
 hi ColorColumn ctermbg=8 guibg=#606060
 
-"Columna de visualizacion de marcas
+" Marks column
 hi SignColumn ctermbg=0
 hi SignatureMarkLine ctermbg=233
 hi SignatureMarkerText ctermbg=8 ctermfg=12
 hi SignatureMarkText ctermbg=0 ctermfg=1
 
-"Simbolos de cambios en Git
+" GitGutter Symbols
 hi GitGutterAdd          cterm=bold ctermfg=28  ctermbg=0 gui=none guifg=bg guibg=Red
 hi GitGutterChange       cterm=bold ctermfg=208 ctermbg=0 gui=none guifg=bg guibg=Red
 hi GitGutterDelete       cterm=bold ctermfg=160 ctermbg=0 gui=none guifg=bg guibg=Red
@@ -282,16 +288,6 @@ let g:airline_symbols.whitespace = ''
 let g:airline#extensions#tabline#left_sep = ''
 let g:airline#extensions#tabline#left_alt_sep = ' '
 
-
-
-" ---------------------------------------------\
-" -- Configuracion del plugin Notes
-" -----------------------------------------------------------------------------\
-" Extension de los ficheros de notas
-let g:notes_suffix = '.vnt'
-
-" Directorio donde se almacenan las notas
-let g:notes_directories = ['~/.vim/notes/vim_notes']
 
 
 
@@ -340,6 +336,5 @@ let g:tagbar_type_go = {
   \ 'ctagsbin'  : 'gotags',
   \ 'ctagsargs' : '-sort -silent'
 \ }
-nmap <F8> :TagbarToggle<CR>
 
 match ExtraWhitespace /\s\+$/

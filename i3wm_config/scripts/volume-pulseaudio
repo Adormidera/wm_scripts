@@ -23,7 +23,7 @@ SHORT_FORMAT=${SHORT_FORMAT:-'${SYMB}${VOL}%'}
 CURRENT_FORMAT="$SHORT_FORMAT"
 FORMAT_FLAG=0
 
-USE_ALSA_NAME=${USE_ALSA_NAME:-0}
+USE_ALSA_NAME=${USE_ALSA_NAME:-1}
 USE_DESCRIPTION=${USE_DESCRIPTION:-0}
 
 SUBSCRIBE=${SUBSCRIBE:-0}
@@ -91,7 +91,7 @@ CAPABILITY=$(amixer -D $MIXER get $SCONTROL | sed -n "s/  Capabilities:.*cvolume
 
 function move_sinks_to_new_default {
     DEFAULT_SINK=$1
-    pacmd list-sink-inputs | grep index: | grep -o '[0-9]\+' | while read SINK
+    pactl list sink-inputs | grep index: | grep -o '[0-9]\+' | while read SINK
     do
         pacmd move-sink-input $SINK $DEFAULT_SINK
     done
@@ -99,12 +99,17 @@ function move_sinks_to_new_default {
 
 function set_default_playback_device_next {
     inc=${1:-1}
-    num_devices=$(pacmd list-sinks | grep -c index:)
-    sink_arr=($(pacmd list-sinks | grep index: | grep -o '[0-9]\+'))
-    default_sink_index=$(( $(pacmd list-sinks | grep index: | grep -no '*' | grep -o '^[0-9]\+') - 1 ))
-    default_sink_index=$(( ($default_sink_index + $num_devices + $inc) % $num_devices ))
-    default_sink=${sink_arr[$default_sink_index]}
-    pacmd set-default-sink $default_sink
+    num_devices=$(pactl list sinks | grep -c "Sink #")
+    sink_arr=($(pactl list sinks | grep "Sink #" | grep -o '[0-9]\+'))
+    default_sink_index=$(pactl list sinks short | grep $(pactl info | grep "Default Sink" | cut -d" " -f 3) | cut -f 1)
+    for i in "${!sink_arr[@]}"; do
+        if [[ "${sink_arr[$i]}" = "${default_sink_index}" ]]; then
+          default_sink_index=${sink_arr[$(($(($i+1))%$num_devices))]}
+          break
+        fi
+    done
+
+    pactl set-default-sink $default_sink_index
     move_sinks_to_new_default $default_sink
 }
 
@@ -129,9 +134,8 @@ function print_format {
 }
 
 function print_block {
-    ACTIVE=$(pacmd list-sinks | grep "state\: RUNNING" -B4 -A7 | grep "index:\|name:\|volume: \(front\|mono\)\|muted:")
-    [ -z "$ACTIVE" ] && ACTIVE=$(pacmd list-sinks | grep "index:\|name:\|volume: \(front\|mono\)\|muted:" | grep -A3 '*')
-    for name in INDEX NAME VOL MUTED; do
+    ACTIVE=$(pactl list sinks | grep "Sink #$(pactl list sinks short | grep $(pactl info | grep "Default Sink" | cut -d" " -f 3) | cut -f 1)" -B1 -A50 | grep "alsa.card \|Description\|Volume: \(front\|mono\)\|Mute:")
+    for name in NAME MUTED VOL INDEX; do
         read $name
     done < <(echo "$ACTIVE")
     INDEX=$(echo "$INDEX" | grep -o '[0-9]\+')
@@ -139,19 +143,18 @@ function print_block {
     VOL="${VOL%?}"
 
     NAME=$(echo "$NAME" | sed \
-'s/.*<.*\.\(.*\)>.*/\1/; t;'\
-'s/.*<\(.*\)>.*/\1/; t;'\
+'s/.*: \(.*\)/\1/; t;'\
 's/.*/unknown/')
 
     if [[ $USE_ALSA_NAME == 1 ]] ; then
-        ALSA_NAME=$(pacmd list-sinks |\
+        ALSA_NAME=$(pactl list sinks |\
 awk '/^\s*\*/{f=1}/^\s*index:/{f=0}f' |\
 grep "alsa.name\|alsa.mixer_name" |\
 head -n1 |\
 sed 's/.*= "\(.*\)".*/\1/')
         NAME=${ALSA_NAME:-$NAME}
     elif [[ $USE_DESCRIPTION == 1 ]] ; then
-        DESCRIPTION=$(pacmd list-sinks |\
+        DESCRIPTION=$(pactl list sinks |\
 awk '/^\s*\*/{f=1}/^\s*index:/{f=0}f' |\
 grep "device.description" |\
 head -n1 |\

@@ -51,7 +51,7 @@ set $right l
 floating_modifier Mod1
 
 # start a terminal
-bindsym Mod1+Return exec terminator
+bindsym Mod1+Return exec st
 
 # kill focused window
 bindsym Mod1+Shift+q kill
@@ -208,7 +208,7 @@ client.background       #FFFFFF
 
 # TOP BAR
 bar {
-	position       top
+  position       top
   status_command i3blocks -c ~/.config/i3/i3blocks_config_top
   tray_output    eDP-1
 
@@ -227,7 +227,7 @@ bar {
 
 # BOTTOM BAR
 bar {
-	position          bottom
+  position          bottom
   status_command    i3blocks -c ~/.config/i3/i3blocks_config_bottom
   workspace_buttons no
   tray_output       none
@@ -242,22 +242,21 @@ bar {
 bindsym XF86MonBrightnessUp exec brightnessctl s +10%
 bindsym XF86MonBrightnessDown exec brightnessctl s 10%-
 
-exec --no-startup-id feh --bg-fill /opt/wallpaper2.jpg
+exec --no-startup-id feh --bg-fill /opt/wallpaper.jpeg
 exec --no-startup-id compton
 for_window [class="^.*"] border pixel 0
 for_window [class="Yad"] floating enable
-gaps inner 5
-gaps outer 5
 
 
 bindsym Mod1+BackSpace exec ~/.config/i3/scripts/i3lock/lock
 
-set $session " Lock     Exit     Reboot     Poweroff"
+set $session " Lock(l)     Exit(e)     Reboot(r)     Poweroff(p)     Suspend(s)"
 mode $session {
          bindsym e exec --no-startup-id $psst i3-msg exit; mode "default"
          bindsym l exec --no-startup-id $psst ~/.config/i3/scripts/i3lock/lock; mode "default"
          bindsym p exec --no-startup-id $psst systemctl poweroff; mode "default"
          bindsym r exec --no-startup-id $psst systemctl reboot; mode "default"
+         bindsym s exec --no-startup-id $psst systemctl suspend; mode "default"
 
          bindsym q mode "default"
          bindsym Escape mode "default"

@@ -17,30 +17,28 @@ label=
 color=#81b71a
 
 [vpn]
-command=~/.config/i3/scripts/vpn
-label=VPN:
+command=~/.config/i3/scripts/vpn_menu
 interval=10
 
 [iface]
 command=~/.config/i3/scripts/iface -f " {status}" -cg "#1FC40D" -cc "#DE1212"
-instance=enp9s0
+instance=enp44s0u1
 interval=10
 
-[wifi]
-command=~/.config/i3/scripts/wifi -f " {status}" -cg "#1FC40D" -cc "#DE1212"
-instance=wlp8s0
-interval=10
+#[wifi]
+#command=~/.config/i3/scripts/wifi -f " {status}" -cg "#1FC40D" -cc "#DE1212"
+#instance=wlp0s20f3
+#interval=10
 
 [wifi2]
 command=~/.config/i3/scripts/wifi_menu
-instance=wlp8s0
-label=---
 interval=10
 
 [temp]
 label= 
-command=~/.config/i3/scripts/temp
+command=~/.config/i3/scripts/temperature -s acpitz-acpi-0 -G
 interval=10
+color=#1FC40D
 
 [battery]
 command=~/.config/i3/scripts/battery

@@ -18,7 +18,7 @@
 #  Author: Beau Hastings <beau@saweet.net>
 #  URL: https://github.com/hastinbe/i3blocks-gradient-temp
 
-FONT=${FONT:-"FontAwesome"}
+#FONT=${FONT:-"FontAwesome"}
 SENSOR=${SENSOR:-$BLOCK_INSTANCE}
 GRADIENT=${GRADIENT:-true}
 FAHRENHEIT=${FAHRENHEIT:-false}

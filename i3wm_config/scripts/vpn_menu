@@ -8,7 +8,7 @@ from subprocess import call, check_output, CalledProcessError
 import re
 import os
 
-WIFI_SYMBOL = "\uf1eb"
+VPN_SYMBOL = "\uf233"
 CONNECT = "\uf1e6"
 DISCONNECT = "\uf00d"
 APPLY_SYMBOL = "\uf00c"
@@ -17,9 +17,9 @@ REFRESH_SYMBOL = "\uf021"
 
 CONNECTED_COLOR='#1FC40D'
 DISCONNECTED_COLOR='#DE1212'
-CONNECTED_STRING = "<span color=\"" + CONNECTED_COLOR + "\">" + WIFI_SYMBOL + " up</span>"
-CONNECTED_STRING_LONG = "<span color=\"" + CONNECTED_COLOR + "\">" + WIFI_SYMBOL + " up [{}]</span>"
-DISCONNECTED_STRING = "<span color=\"" + DISCONNECTED_COLOR + "\">" + WIFI_SYMBOL + " down</span>"
+CONNECTED_STRING = "<span color=\"" + CONNECTED_COLOR + "\">" + VPN_SYMBOL + " up</span>"
+CONNECTED_STRING_LONG = "<span color=\"" + CONNECTED_COLOR + "\">" + VPN_SYMBOL + " up [{}]</span>"
+DISCONNECTED_STRING = "<span color=\"" + DISCONNECTED_COLOR + "\">" + VPN_SYMBOL + " down</span>"
 
 strbool = lambda s: s.lower() in ['t', 'true', '1']
 def _default(name, default='', arg_type=strbool):
@@ -53,6 +53,21 @@ AVAILABLE_FG_COLOR = "steelblue2"
 
 WINDOW_CLOSE_TO_BOUNDARY_BUFFER = _default("CLOSE_TO_BOUNDARY_BUFFER", 20, int)
 
+class popupWindow(object):
+    def __init__(self,master,network):
+        top=self.top=Toplevel(master, bg=DEFAULT_BG_COLOR, height='400', width='100')
+        top.attributes('-type', 'dialog')
+        self.l=Label(top,text="Insert Password for {}".format(network),bg=DEFAULT_BG_COLOR,fg=DEFAULT_FG_COLOR)
+        self.l.pack()
+        self.e=Entry(top,show="*",bg=DEFAULT_BG_COLOR,fg=DEFAULT_FG_COLOR)
+        self.e.pack()
+        self.b=Button(top,text='Ok',command=self.cleanup,bg=DEFAULT_BG_COLOR,fg=DEFAULT_FG_COLOR)
+        self.b.pack()
+    def cleanup(self):
+        self.value=self.e.get()
+        self.top.destroy()
+
+
 
 class Output:
     def __init__(self, w=None, h=None, x=None, y=None, name=None, connected=False, bssid=None, signal=None, rate=None):
@@ -60,53 +75,43 @@ class Output:
         self.h = h
         self.x = x
         self.y = y
-        self.currentModeIndex = None
-        self.preferredModeIndex = None
         self.row = None
         self.connected = connected
-        self.exists = connected
         self.name = name
-        self.bssid = bssid
-        self.rate = rate
-        self.signal = signal
 
     def getWifiList():
         """
         Get the available wifi list using nmcli
         """
         outputs = []
-        networksText = check_output(["nmcli","d", "wifi", "list"], universal_newlines=True)
-        networksBlocks = networksText.splitlines()[1:]
-        infoPattern = re.compile(r'^(\**)?\s*(\S*)\s*(\S*)\s*\S*\s*\S*\s*(\S* \S*)\s*(\S*).*')
+        networksText = check_output(["nmcli", "-t", "-f", "NAME,ACTIVE,TYPE", "connection", "show"], universal_newlines=True)
+        networksBlocks = networksText.splitlines()
+        infoPattern = re.compile(r'^(.*):(\S*):(\S*)$')
 
         for networkBlocks in networksBlocks:
             output = Output()
             infoMatch = infoPattern.match(networkBlocks)
             if infoMatch:
-                output.bssid = infoMatch.group(2)
-                output.name = infoMatch.group(3)
-                output.rate = infoMatch.group(4)
-                output.signal = infoMatch.group(5)
-                if len(infoMatch.group(1)) != 0:
+                if infoMatch.group(3) != 'vpn':
+                    continue
+                output.name = infoMatch.group(1)
+                if infoMatch.group(2) == 'yes':
                     output.connected = True
-                    CURRENT_NETWORK = output.name
-                # Discard empty
-                if output.name != "--":
-                    outputs.append(output)
-
-        outputs.sort(key=lambda x: x.signal, reverse=False)
+                else:
+                    output.connected = False
+                outputs.append(output)
 
         return outputs
 
     def modestr(mode):
         return "{}x{}@{}".format(*mode)
 
-class WifiManager():
+class VPNManager():
     def __init__(self, root):
         self.root = root
         self.root.withdraw()
         self.root.resizable(0,0)
-        self.root.wm_title("Wifi Manager")
+        self.root.wm_title("VPN Manager")
         self.frame = None
         self.outputs = []
         self.hardRefreshList()
@@ -192,31 +197,34 @@ class WifiManager():
 
     def connect(self, e):
         conn = e.widget.output
-        os.system('nmcli con up {}'.format(conn.name))
+        m=popupWindow(self.root, conn.name)
+        self.root.wait_window(m.top)
+        if m.value is None or m.value == '':
+            return
+
+        os.system('echo vpn.secrets.password:{} | nmcli c up "{}" passwd-file /dev/fd/0'.format(m.value, conn.name))
         self.softRefreshList()
-        CURRENT_NETWORK = conn.name
 
     def disconnect(self, e):
         conn = e.widget.output
-        os.system('nmcli con down {}'.format(conn.name))
+        os.system('nmcli con down "{}"'.format(conn.name))
         self.softRefreshList()
-        CURRENT_NETWORK = ''
 
 
 
     def softRefreshList(self, e=None):
         for widget in self.toggleButtons:
             if widget.output.connected:
-                self.setInfo(widget, "Disconnect from {}".format(widget.output.name))
+                self.setInfo(widget, "Disconnect")
                 widget.bind("<Button-1>", self.disconnect)
             else:
-                self.setInfo(widget, "Connect to {}".format(widget.output.name))
+                self.setInfo(widget, "Connect")
                 widget.bind("<Button-1>", self.connect)
             widget.config(text=" " + DISCONNECT if widget.output.connected else CONNECT)
             widget.config(fg=CONNECT_FG_COLOR if not widget.output.connected else DISCONNECT_FG_COLOR)
 
         for widget in self.nameLabels:
-            widget.config(text=" {}\t ({}%)  [{}]".format(widget.output.name, widget.output.signal, widget.output.rate))
+            widget.config(text=" {}".format(widget.output.name))
             widget.config(fg=AVAILABLE_FG_COLOR if not widget.output.connected else CONNECTED_FG_COLOR)
 
     def hardRefreshList(self, e=None):
@@ -269,14 +277,19 @@ def setLabelAndOutputModeFunc(var, label, output, i):
         output.setMode(i)
     return func
 
+
 def getCurrentNetwork():
-    connsText = check_output(["nmcli", "-f", "TYPE,NAME", "connection", "show", "--active"], universal_newlines=True)
-    connBlocks = connsText.splitlines()[1:]
-    infoPattern = re.compile(r'^(\S*)\s*(\S*)\s*$')
+    connsText = check_output(["nmcli", "-t", "-f", "NAME,ACTIVE,TYPE", "connection", "show", "--active"], universal_newlines=True)
+    connBlocks = connsText.splitlines()
+    infoPattern = re.compile(r'^(.*):(\S*):(\S*)$')
+
+
     for con in connBlocks:
         infoMatch = infoPattern.match(con)
-        if infoMatch and infoMatch.group(1) == 'wifi':
-            return infoMatch.group(2)
+        if infoMatch and infoMatch.group(3) == 'vpn':
+            return infoMatch.group(1)
+    return None
+
 
 def printOutput(long=False):
     network = getCurrentNetwork()
@@ -290,17 +303,19 @@ def printOutput(long=False):
 
 
 if os.environ.get('BLOCK_BUTTON') == "1":
+#if True:
     if os.fork() != 0:
         root = Tk()
         root.configure(bg=DEFAULT_BG_COLOR)
         if DEFAULT_FONT_FAMILY and DEFAULT_FONT_SIZE:
             font.nametofont("TkDefaultFont").config(family=DEFAULT_FONT_FAMILY, size=DEFAULT_FONT_SIZE)
-        manager = WifiManager(root)
+        manager = VPNManager(root)
         root.mainloop()
     else:
         printOutput()
 
 elif os.environ.get('BLOCK_BUTTON') == "3":
+#elif True:
     printOutput(long=True)
 
 else:
