@@ -1,62 +1,51 @@
-#!/usr/bin/perl
+#!/usr/bin/sh
 #
-# Copyright 2014 Pierre Mavro <deimos@deimos.fr>
-# Copyright 2014 Vivien Didelot <vivien@didelot.org>
-# Copyright 2014 Andreas Guldstrand <andreas.guldstrand@gmail.com>
+# Alejandro Villegas López (r2dedios)
 #
-# Licensed under the terms of the GNU GPL v3, or any later version.
 
-use strict;
-use warnings;
-use utf8;
-use Getopt::Long;
+# Run parameters
+ICON=""
+ITERATIONS=5 # number of iterations
+DELAY=0.05   # Seconds between top iterations
 
-# default values
-my $t_warn = $ENV{T_WARN} // 50;
-my $t_crit = $ENV{T_CRIT} // 80;
-my $cpu_usage = -1;
-my $decimals = $ENV{DECIMALS} // 2;
-my $label = $ENV{LABEL} // "";
+# Intervals in percentage
+ERR_LIMIT=90
+WARN_LIMIT=70
 
-sub help {
-    print "Usage: cpu_usage [-w <warning>] [-c <critical>] [-d <decimals>]\n";
-    print "-w <percent>: warning threshold to become yellow\n";
-    print "-c <percent>: critical threshold to become red\n";
-    print "-d <decimals>:  Use <decimals> decimals for percentage (default is $decimals) \n"; 
-    exit 0;
-}
+# Colors
+OK_COLOR="#1FC40D"
+WARN_COLOR="#FFA600"
+ERR_COLOR="#DE1212"
 
-GetOptions("help|h" => \&help,
-           "w=i"    => \$t_warn,
-           "c=i"    => \$t_crit,
-           "d=i"    => \$decimals,
-);
-
-# Get CPU usage
-$ENV{LC_ALL}="en_US"; # if mpstat is not run under en_US locale, things may break, so make sure it is
-open (MPSTAT, 'mpstat 1 1 |') or die;
-while (<MPSTAT>) {
-    if (/^.*\s+(\d+\.\d+)[\s\x00]?$/) {
-        $cpu_usage = 100 - $1; # 100% - %idle
-        last;
+# Get CPU current usage
+cpu=$(top -d $DELAY -bn$ITERATIONS |
+  grep "Cpu(s)" |
+  sed "s/.*, *\([0-9.]*\)%* id.*/\1/" |
+  awk '
+    BEGIN {
+      n=0
+      sum=0
     }
-}
-close(MPSTAT);
 
-$cpu_usage eq -1 and die 'Can\'t find CPU information';
+    {
+      n+=1
+      sum+=(100-$1)
+    }
 
-# Print short_text, full_text
-print "${label}";
-printf "%.${decimals}f%%\n", $cpu_usage;
-print "${label}";
-printf "%.${decimals}f%%\n", $cpu_usage;
+    END {
+     print sum/n""
+    }
+  '
+)
 
-# Print color, if needed
-if ($cpu_usage >= $t_crit) {
-    print "#FF0000\n";
-    exit 33;
-} elsif ($cpu_usage >= $t_warn) {
-    print "#FFFC00\n";
-}
+# Printing
+if echo "$cpu > $ERR_LIMIT" | bc -l | grep -q 1; then
+  COLOR="bgcolor=\"$ERR_COLOR\""
+elif echo "$cpu > $WARN_LIMIT" | bc -l | grep -q 1; then
+  COLOR="color=\"$WARN_COLOR\""
+else
+  COLOR="color=\"$OK_COLOR\""
+fi
 
-exit 0;
+OUTPUT="<span $COLOR font='FontAwesome'>$ICON  </span><span $COLOR>$cpu%</span>"
+echo "$OUTPUT"
