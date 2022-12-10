@@ -1,3 +1,4 @@
-*.swp
+*.sw[po]
 vim_config/vim
 vim
+.idea/
