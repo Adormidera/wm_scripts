@@ -2,3 +2,5 @@
 vim_config/vim
 vim
 .idea/
+__pycache__/
+*.py[co]
