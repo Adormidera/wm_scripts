@@ -1,48 +1,54 @@
-#!/bin/sh
-# Copyright (C) 2014 Julien Bonjean <julien@bonjean.info>
+#!/usr/bin/sh
+#
+# Adormidera Organization
+################################################################################
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Sourcing init vars
+ARF_SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+source $ARF_SCRIPT_DIR/init.vars
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Icon
+ARF_ICON="${ARF_ICON:=}"
 
-DIR="${DIR:-$BLOCK_INSTANCE}"
-DIR="${DIR:-$HOME}"
-ALERT_LOW="${ALERT_LOW:-$1}"
-ALERT_LOW="${ALERT_LOW:-10}" # color will turn red under this value (default: 10%)
 
-LOCAL_FLAG="-l"
-if [ "$1" = "-n" ] || [ "$2" = "-n" ]; then
-    LOCAL_FLAG=""
-fi
+# RUN
+ARF_DIR="${ARF_DIR:=/}"
 
-df -h -P $LOCAL_FLAG "$DIR" | awk -v label="$LABEL" -v alert_low=$ALERT_LOW '
-/\/.*/ {
-	# full text
-	print label $4
-
-	# short text
-	print label $4
-
-	use=$5
-
-	# no need to continue parsing
-	exit 0
-}
-
-END {
-	gsub(/%$/,"",use)
-	if (100 - use < alert_low) {
-		# color
-		print "#FF0000"
-	}
-}
+awk \
+  -v arf_icon=$ARF_ICON \
+  -v arf_dir=$ARF_DIR \
+  -v arf_warn_limit=$ARF_WARN_LIMIT \
+  -v arf_err_limit=$ARF_ERR_LIMIT \
+  -v arf_ok_color=$ARF_OK_COLOR \
+  -v arf_warn_color=$ARF_WARN_COLOR \
+  -v arf_err_color=$ARF_ERR_COLOR \
+  -v block_button=$BLOCK_BUTTON \
+  -v arf_left_click=$ARF_LEFT_CLICK \
 '
+/\/.*/ {
+  # Removing "%" to compare values
+  pct=$5
+  gsub(/%$/,"",pct)
+
+  # Convert to Int
+  pct=pct+0
+
+  # Checking thresholds
+  if (pct > arf_err_limit) {
+    color=arf_err_color
+  } else if (pct > arf_warn_limit) {
+    color=arf_warn_color
+  } else {
+    color=arf_ok_color
+  }
+
+  # Printing
+  if (block_button == arf_left_click) {
+    printf("<span color=\"%s\">%s Mount: %s - %.1fG/%.1fG (%.f%%)</span>\n",
+    color, arf_icon, arf_dir, $3, $2, pct)
+  }
+
+  printf("<span color=\"%s\">%s %.f%%</span>\n", color, arf_icon, $5)
+}
+' <<< $(df -h -P -l "$ARF_DIR")
