@@ -1,0 +1,55 @@
+#!/usr/bin/sh
+#
+# Adormidera Organization
+################################################################################
+
+# Sourcing init vars
+ARF_SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+source $ARF_SCRIPT_DIR/init.vars
+
+
+# Icon
+ARF_ICON="${ARF_ICON:=}"
+
+
+# Run
+ITERATIONS=5 # number of "top" command iterations
+DELAY=0.05   # Seconds between top iterations
+
+# Get CPU current usage
+cpu=$(top -d $DELAY -bn$ITERATIONS |
+  grep "Cpu(s)" |
+  sed "s/.*, *\([0-9.]*\)%* id.*/\1/" |
+  awk '
+    BEGIN {
+      n=0
+      sum=0
+    }
+
+    {
+      n+=1
+      sum+=(100-$1)
+    }
+
+    END {
+     print sum/n""
+    }
+  '
+)
+
+# Printing
+if echo "$cpu > $ARF_ERR_LIMIT" | bc -l | grep -q 1; then
+  COLOR="color=\"$ARF_ERR_COLOR\""
+elif echo "$cpu > $ARF_WARN_LIMIT" | bc -l | grep -q 1; then
+  COLOR="color=\"$ARF_WARN_COLOR\""
+else
+  COLOR="color=\"$ARF_OK_COLOR\""
+fi
+
+if [[ "$BLOCK_BUTTON" -eq "$ARF_LEFT_CLICK" ]]; then
+  OUTPUT="<span $COLOR font=\"FontAwesome\">$ARF_ICON </span><span $COLOR>$(uptime | sed 's/.*load average: \(.*\)/\1/') ($cpu%)</span>"
+else
+  OUTPUT="<span $COLOR font=\"FontAwesome\">$ARF_ICON </span><span $COLOR>$cpu%</span>"
+fi
+
+echo -e "$OUTPUT"

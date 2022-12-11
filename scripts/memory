@@ -1,11 +1,30 @@
-#!/bin/sh
-TYPE="${BLOCK_INSTANCE:-mem}"
-MODE=0
-if [[ "$BLOCK_BUTTON" -eq 1 ]]; then
-	MODE=1
-fi
+#!/usr/bin/sh
+#
+# Adormidera Organization
+################################################################################
 
-awk -v type=$TYPE -v mode=$MODE '
+# Sourcing init vars
+ARF_SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+source $ARF_SCRIPT_DIR/init.vars
+
+
+# Icon
+ARF_ICON="${ARF_ICON:=}"
+
+
+# Run
+TYPE="${TYPE:-mem}"
+awk \
+  -v type=$TYPE \
+  -v arf_icon=$ARF_ICON \
+  -v arf_warn_limit=$ARF_WARN_LIMIT \
+  -v arf_err_limit=$ARF_ERR_LIMIT \
+  -v arf_ok_color=$ARF_OK_COLOR \
+  -v arf_warn_color=$ARF_WARN_COLOR \
+  -v arf_err_color=$ARF_ERR_COLOR \
+  -v block_button=$BLOCK_BUTTON \
+  -v arf_left_click=$ARF_LEFT_CLICK \
+'
 /^MemTotal:/ {
 	mem_total=$2
 }
@@ -35,23 +54,26 @@ END {
 		total=mem_total/1024/1024
 	}
 
+  # Calculating %
 	pct=0
 	if (total > 0) {
 		pct=used/total*100
 	}
 
-	if (mode == 1) {
-		printf("<span>%.1fG/%.1fG (%.f%%)</span>\n", used, total, pct)
+  # Checking thresholds
+	if (pct > arf_err_limit) {
+		color=arf_err_color
+	} else if (pct > arf_warn_limit) {
+		color=arf_warn_color
+	} else {
+		color=arf_ok_color
 	}
 
-	printf("%.f%%\n", pct)
-
-	if (pct > 90) {
-		print("#FF0000")
-	} else if (pct > 80) {
-		print("#FFAE00")
-	} else if (pct > 70) {
-		print("#FFF600")
+  # Printing
+	if (block_button == arf_left_click) {
+		printf("<span color=\"%s\">%s %.1fG/%.1fG (%.f%%)</span>\n", color, arf_icon, used, total, pct)
 	}
+
+	printf("<span color=\"%s\">%s %.f%%</span>\n", color, arf_icon, pct)
 }
 ' /proc/meminfo
