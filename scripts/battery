@@ -70,7 +70,10 @@ if [[ -d $BATTERY_DIR ]]; then
   fi
   if [[ $SECONDS_REMAINING != "" ]]; then
     REMAINING=$(date -u +%H:%M:%S -d@$SECONDS_REMAINING)
+  else
+    REMAINING="Full"
   fi
+
 fi
 
 
