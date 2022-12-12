@@ -45,6 +45,8 @@ if [[ -d $BATTERY_DIR ]]; then
   POWER="$(cat $BATTERY_DIR/power_now)"
   FULL="$(cat $BATTERY_DIR/energy_full)"
 
+
+  # Checking for Batery icon
   if [[ $CAPACITY -gt 95 ]]; then
     BATERY_ICON="$ICON_BATTERY_USE_FULL"
   elif [[ $CAPACITY -gt 75 ]]; then
@@ -56,7 +58,8 @@ if [[ -d $BATTERY_DIR ]]; then
   elif [[ $CAPACITY -le 25 ]]; then
     BATERY_ICON="$ICON_BATTERY_USE_EMPTY"
   fi
-  
+
+
   if [[ "$STATUS" == "Charging" ]]; then
     # SecsRemaining = 3600 * mWh / microAh
     SECONDS_REMAINING=$(echo "scale=8; 3600*($FULL - $ENERGY)/$POWER" | bc)
@@ -65,17 +68,16 @@ if [[ -d $BATTERY_DIR ]]; then
     # SecsRemaining = 3600 * (mWh - mWh) / microAh
     SECONDS_REMAINING=$(echo "scale=8; 3600*$ENERGY/$POWER" | bc)
   fi
-  REMAINING=$(date -u +%H:%M:%S -d@$SECONDS_REMAINING)
+  if [[ $SECONDS_REMAINING != "" ]]; then
+    REMAINING=$(date -u +%H:%M:%S -d@$SECONDS_REMAINING)
+  fi
 fi
-
-# Checking for Batery icon
-  
 
 
 # Printing
-if echo "$CAPACITY > $ARF_ERR_LIMIT" | bc -l | grep -q 1; then
+if echo "100 - $CAPACITY > $ARF_ERR_LIMIT" | bc -l | grep -q 1; then
   COLOR="color=\"$ARF_ERR_COLOR\""
-elif echo "$CAPACITY > $ARF_WARN_LIMIT" | bc -l | grep -q 1; then
+elif echo "100 - $CAPACITY > $ARF_WARN_LIMIT" | bc -l | grep -q 1; then
   COLOR="color=\"$ARF_WARN_COLOR\""
 else
   COLOR="color=\"$ARF_OK_COLOR\""
@@ -83,7 +85,7 @@ fi
 
 if [[ "$BLOCK_BUTTON" -eq "$ARF_LEFT_CLICK" ]]; then
   OUTPUT="<span $COLOR font=\"FontAwesome\">$ARF_ICON </span><span color=\"#EBD203\">$AC_CONNECTED</span><span $COLOR>$BATERY_ICON [$REMAINING]($CAPACITY%)</span>"
-else            
+else
   OUTPUT="<span $COLOR font=\"FontAwesome\">$ARF_ICON </span><span color=\"#EBD203\">$AC_CONNECTED</span><span $COLOR>$BATERY_ICON ($CAPACITY%)</span>"
 fi
 
